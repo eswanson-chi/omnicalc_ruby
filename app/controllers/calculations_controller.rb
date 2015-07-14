@@ -11,13 +11,13 @@ class CalculationsController < ApplicationController
     # ================================================================================
 
 
-    @character_count_with_spaces = "Replace this string with your answer."
+    @character_count_with_spaces = @text.length
 
-    @character_count_without_spaces = "Replace this string with your answer."
+    @character_count_without_spaces = @text.gsub(" ", "").length
 
-    @word_count = "Replace this string with your answer."
+    @word_count = @text.split.size
 
-    @occurrences = "Replace this string with your answer."
+    @occurrences = @text.split.count("#{@special_word}")
   end
 
   def loan_payment
@@ -32,7 +32,18 @@ class CalculationsController < ApplicationController
     # The principal value the user input is in the decimal @principal.
     # ================================================================================
 
-    @monthly_payment = "Replace this string with your answer."
+        # A = Loan Amount
+        @A = @principal
+        # r = Rate of Interest (compounded) = APR/1200 [monthly]
+        @r = @apr / 1200
+        # N = Number of Payments = Number of Years * 12
+        @N = @years * 12
+        # P = Payment Amount
+        @P = ( @r * @A ) / ( 1 - (1+@r)**-@N)
+
+
+
+    @monthly_payment = @P
   end
 
   def time_between
@@ -48,12 +59,15 @@ class CalculationsController < ApplicationController
     #   number of seconds as a result.
     # ================================================================================
 
-    @seconds = "Replace this string with your answer."
-    @minutes = "Replace this string with your answer."
-    @hours = "Replace this string with your answer."
-    @days = "Replace this string with your answer."
-    @weeks = "Replace this string with your answer."
-    @years = "Replace this string with your answer."
+    # Calculate days first
+
+
+    @seconds = @ending - @starting
+    @minutes = (@ending - @starting) / 60
+    @hours = ((@ending - @starting) / 60) / 60
+    @days = (((@ending - @starting) / 60) / 60) / 24
+    @weeks = ((((@ending - @starting) / 60) / 60) / 24) / 7
+    @years = (((((@ending - @starting) / 60) / 60) / 24) / 7) / 52
   end
 
   def descriptive_statistics
@@ -64,26 +78,56 @@ class CalculationsController < ApplicationController
     # The numbers the user input are in the array @numbers.
     # ================================================================================
 
-    @sorted_numbers = "Replace this string with your answer."
+    @sorted_numbers = @numbers.sort
 
-    @count = "Replace this string with your answer."
+    @count = @numbers.size
 
-    @minimum = "Replace this string with your answer."
+    @minimum = @numbers.min
 
-    @maximum = "Replace this string with your answer."
+    @maximum = @numbers.max
 
-    @range = "Replace this string with your answer."
+    @range = @numbers.max - @numbers.min
 
-    @median = "Replace this string with your answer."
+        @mid = (@sorted_numbers.size) / 2
+        if @mid.odd?
+            @median = @sorted_numbers[@mid]
+        else
+            @median = (@sorted_numbers[@mid - 1] + @sorted_numbers[@mid]) / 2
+        end
+    @median = @median.to_f
 
-    @sum = "Replace this string with your answer."
+    @sum = @numbers.sum
 
-    @mean = "Replace this string with your answer."
+    @mean = @numbers.sum / @numbers.size
 
-    @variance = "Replace this string with your answer."
+        @v = 0
+        @numbers.each do |i|
+            @v = @v + (i - @mean)**2
+        end
+    @variance = @v / @numbers.size
 
-    @standard_deviation = "Replace this string with your answer."
+    @standard_deviation = @variance**0.5
 
-    @mode = "Replace this string with your answer."
+        @m = "NULL"
+        @c = 0
+        @multi = 0
+        @w = 23400
+        @numbers.each do |j|
+            @w = j
+                if @numbers.count(@w) == @c
+                    if @w != @m
+                        @multi = 1
+                    end
+                elsif @numbers.count(@w) > @c
+                    @m = @w
+                    @c = @numbers.count(@w)
+                    @multi = 0
+                end
+        end
+        if @multi == 1
+            @mode = 'multiple modes'
+        else
+            @mode = @w #@numbers.count(23400) #
+        end
   end
 end
